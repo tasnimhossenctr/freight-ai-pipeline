@@ -111,6 +111,30 @@ To ensure accurate segmentation across diverse commercial fleets, the dataset is
 
 Freight AI utilizes a **Hybrid Deployment Model** to balance low latency with deep contextual reasoning:
 
+
+                              ┌───────────────────────────────┐
+                              │ Highway Monitoring Camera     │
+                              │ (I-295 SB Pass / Drive Feed)  │
+                              └───────────────┬───────────────┘
+                                              │
+                                              ▼
+                               ┌─────────────────────────────┐
+                               │  Data Filtering & Pre-Proc  │
+                               └──────────────┬──────────────┘
+                                              │
+                    ┌─────────────────────────┴─────────────────────────┐
+                    │                                                   │
+                    ▼                                                   ▼
+     ┌─────────────────────────────┐                     ┌─────────────────────────────┐
+     │ Real-Time Edge Deployment   │                     │  Cloud Audit & Retraining   │
+     │ (YOLOv8-Seg Instance Model) │                     │   (Gemini Multimodal LLM)   │
+     ├─────────────────────────────┤                     ├─────────────────────────────┤
+     │ • Latency: 12.4 ms          │                     │ • Latency: ~1,400 ms        │
+     │ • Purpose: 55 mph Screening │                     │ • Purpose: Permit Audit /   │
+     │ • Output: Pixel Polygon     │                     │   Automated Auto-Labeling   │
+     └─────────────────────────────┘                     └─────────────────────────────┘
+
+
 freight-ai-pipeline/
 │
 ├── data/
@@ -135,24 +159,3 @@ freight-ai-pipeline/
 ├── requirements.txt                  # Python dependencies
 └── README.md                         # Repository documentation
 
-                              ┌───────────────────────────────┐
-                              │ Highway Monitoring Camera     │
-                              │ (I-295 SB Pass / Drive Feed)  │
-                              └───────────────┬───────────────┘
-                                              │
-                                              ▼
-                               ┌─────────────────────────────┐
-                               │  Data Filtering & Pre-Proc  │
-                               └──────────────┬──────────────┘
-                                              │
-                    ┌─────────────────────────┴─────────────────────────┐
-                    │                                                   │
-                    ▼                                                   ▼
-     ┌─────────────────────────────┐                     ┌─────────────────────────────┐
-     │ Real-Time Edge Deployment   │                     │  Cloud Audit & Retraining   │
-     │ (YOLOv8-Seg Instance Model) │                     │   (Gemini Multimodal LLM)   │
-     ├─────────────────────────────┤                     ├─────────────────────────────┤
-     │ • Latency: 12.4 ms          │                     │ • Latency: ~1,400 ms        │
-     │ • Purpose: 55 mph Screening │                     │ • Purpose: Permit Audit /   │
-     │ • Output: Pixel Polygon     │                     │   Automated Auto-Labeling   │
-     └─────────────────────────────┘                     └─────────────────────────────┘
