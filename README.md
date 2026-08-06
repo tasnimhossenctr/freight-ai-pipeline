@@ -9,7 +9,39 @@
 
 Engineered under the **U.S. Department of Transportation (USDOT) Federal Highway Administration (FHWA) DOTSI Program**, this system combines real-time **YOLOv8-Seg** polygon extraction with zero-shot **Multimodal LLMs (Gemini)** and discrete geometric spatial surface area integration[cite: 2, 3].
 
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
+[![YOLOv8](https://img.shields.io/badge/YOLOv8--Seg-00FFFF.svg)](https://docs.ultralytics.com/)
+[![License](https://img.shields.io/badge/License-CC0--1.0%20%2F%20USDOT-navy.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
+
 ---
+
+## 📌 Outline / Table of Contents
+
+- [Project Description](#-project-description)
+- [Prerequisites](#-prerequisites)
+- [Usage](#-usage)
+- [Utility Functions & System Architecture](#-utility-functions--system-architecture)
+- [Additional Notes & Context on Previous Work](#-additional-notes--context-on-previous-work)
+- [Version History and Retention](#-version-history-and-retention)
+- [License](#-license)
+- [Contributions](#-contributions)
+- [Contact Information](#-contact-information)
+- [Acknowledgements & Contributors](#-acknowledgements--contributors)
+
+---
+
+## 🏛️ Project Description
+
+### Title
+**Automated Freight Compliance & Cargo Instance Segmentation (Freight AI)**
+
+### Purpose and Goals of the Project
+Commercial freight enforcement is critical to protecting highway infrastructure from pavement fatigue, accelerated structural degradation, and bridge deterioration caused by overweight vehicles. State Departments of Transportation (DOTs) enforce strict regulations regarding commercial vehicle load divisibility:
+* **Divisible Loads:** Freight consisting of multi-unit, granular, or separable cargo (e.g., aggregate, soil, gravel, timber, boxed goods) subject to standard statutory gross vehicle and axle weight limits.
+* **Non-Divisible Loads:** Monolithic structural elements, heavy industrial machinery, or single integrated assemblies eligible for state Over-Dimensional / Overweight (OS/OW) permits.
+
+Traditional physical inspections at roadside weigh stations create severe highway corridor bottlenecks and operational delays. **Freight AI** addresses these challenges by developing an automated data collection, computer vision, and multimodal AI modeling pipeline that performs real-time cargo instance segmentation, spatial geometry surface area integration, and statutory compliance classification directly from roadside camera feeds (e.g., I-295 Southbound corridor).
 
 ## 🏛️ Executive Overview
 
@@ -114,29 +146,70 @@ Freight AI utilizes a **Hybrid Deployment Model** to balance low latency with de
  │ • Output: Pixel Polygon     │                     │   Automated Auto-Labeling   │
  └─────────────────────────────┘                     └─────────────────────────────┘
 
- freight-ai-pipeline/
+### Purpose of the Source Code & Relation to Project Goals
+This repository houses the core software engine, data preprocessing scripts, deep learning segmentation pipelines, vision-language prompt frameworks, and validation tools required to automate freight compliance. Specifically, the codebase executes:
+1. **Target Payload Isolation:** Isolates cargo payloads while explicitly ignoring truck tractor cabs, steer axles, tires, undercarriages, and surrounding traffic.
+2. **Polygon Coordinate Extraction & Discrete Surface Geometry:** Traces irregular payload perimeters and computes exact 2D pixel surface areas using Gauss's Shoelace Area Integration.
+3. **Multimodal Compliance Classification:** Employs fine-tuned Vision-Language Models (Gemini) with structured JSON schemas to enforce state-specific commodity and permitting rules.
+
+### Intended Audience
+This project is engineered for state DOTs, commercial vehicle enforcement agencies, Weigh-In-Motion (WIM) gate operators, traffic management centers (TMCs), and transportation research laboratories seeking automated, auditable tools for roadside screening and permit verification.
+
+### Length of Project & Pilot Status
+This repository represents an exploratory pilot research handoff developed under the U.S. Department of Transportation (USDOT) Federal Highway Administration (FHWA) DOTSI Summer Research Program.
+
+---
+
+## 🛠️ Prerequisites
+
+### General Requirements
+* **Operating System:** Linux (Ubuntu 20.04/22.04 recommended), Windows 10/11, or macOS.
+* **Internet Connection:** Required for API-based multimodal LLM inference and downloading pre-trained weights.
+* **Python Environment:** Python 3.10 or later.
+* **Compute / GPU Hardware:** NVIDIA CUDA-compatible GPU (8GB+ VRAM recommended for YOLOv8 training and real-time inference).
+* **Integrated Development Environment (IDE):** Databricks, VS Code, or PyCharm.
+
+### Software & Core Dependencies
+* **Computer Vision & Deep Learning Frameworks:** `torch`, `torchvision`, `ultralytics` (YOLOv8), `opencv-python`, `pillow`.
+* **Multimodal Vision-Language API:** `google-generativeai` (for Gemini zero-shot prompt execution).
+* **Data Processing & Geometry Libraries:** `numpy`, `pandas`, `pydantic`, `shapely`, `matplotlib`.
+
+### Required API Credentials & Datasets
+* **Google Gemini API Key:** Required for executing fine-tuned Multimodal LLM prompt scripts (`src/prompt_engine_v3.py`).
+* **Commercial Vehicle Imagery Corpus:** High-resolution highway camera feeds (e.g., I-295 SB corridor dataset).
+* **CVAT Annotation Exports:** CVAT XML or polyline shapefiles for training custom YOLOv8 segmentation heads.
+
+---
+
+## 🚀 Usage
+
+### Repository Directory Structure
+All execution scripts, pipeline tools, input/output data structures, and documentation assets are organized as follows:
+
+```text
+freight-ai-pipeline/
+│
+├── Code/
+│   └── Freight_AI.Rproj             # RStudio / Environment project file
 │
 ├── data/
-│   ├── raw_images/                   # Unfiltered highway monitoring images
-│   ├── processed_dataset/            # Filtered & split CVAT polygon annotations
-│   └── test_images/                  # Held-out N=50 test evaluation dataset
+│   ├── raw_images/                  # Raw commercial vehicle camera feeds (I-295 corridor)
+│   ├── processed_dataset/           # Converted YOLO segmentation polygon masks
+│   └── test_images/                 # Held-out N=50 evaluation test dataset
 │
 ├── scripts/
-│   ├── Polyline_converter.py         # Converts open CVAT polylines to closed YOLO polygons
-│   ├── data_filtering.py             # Data filtering & quality audit script
-│   └── grid_overlay_generator.py     # Generates high-density coordinate grids for VLM prompts
+│   ├── Polyline_converter.py        # Converts open CVAT polylines to closed 2D polygons
+│   ├── data_filtering.py            # Preprocesses and filters raw vehicle image feeds
+│   └── grid_overlay_generator.py    # Generates 1800x1000 coordinate grid overlays for VLMs
 │
 ├── src/
-│   ├── freight_compliance_validator.py # Class-balance validator & Shoelace math engine
-│   └── prompt_engine_v3.py           # Fine-tuned Multimodal LLM prompt wrapper
+│   ├── freight_compliance_validator.py  # Data quality guardrail & Shoelace math engine
+│   └── prompt_engine_v3.py          # Multimodal VLM prompt execution wrapper
 │
 ├── runs/
 │   └── segment/train/weights/
-│       └── best.pt                   # Fine-tuned YOLOv8-Seg PyTorch weights
+│       └── best.pt                  # Trained YOLOv8-Seg PyTorch model weights
 │
-├── docs/
-│   └── images/                       # Documentation assets and schema diagrams
-│
-├── requirements.txt                  # Python dependencies
-└── README.md                         # Repository documentation
-
+├── docs/                            # Schema diagrams, visual gallery, and HUD assets
+├── requirements.txt                 # Python dependency manifest
+└── README.md                        # Master repository documentation
