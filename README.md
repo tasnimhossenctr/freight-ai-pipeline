@@ -85,3 +85,25 @@ freight-ai-pipeline/
 ├── docs/                             # Documentation assets and schema diagrams
 ├── requirements.txt                  # Python dependencies
 └── README.md                         # Repository documentation
+
+                              ┌───────────────────────────────┐
+                              │ Highway Monitoring Camera     │
+                              │ (I-295 SB Pass / Drive Feed)  │
+                              └───────────────┬───────────────┘
+                                              │
+                                              ▼
+                               ┌─────────────────────────────┐
+                               │  Data Filtering & Pre-Proc  │
+                               └──────────────┬──────────────┘
+                                              │
+                    ┌─────────────────────────┴─────────────────────────┐
+                    │                                                   │
+                    ▼                                                   ▼
+     ┌─────────────────────────────┐                     ┌─────────────────────────────┐
+     │ Real-Time Edge Deployment   │                     │  Cloud Audit & Retraining   │
+     │ (YOLOv8-Seg Instance Model) │                     │   (Gemini Multimodal LLM)   │
+     ├─────────────────────────────┤                     ├─────────────────────────────┤
+     │ • Latency: 12.4 ms          │                     │ • Latency: ~1,400 ms        │
+     │ • Purpose: 55 mph Screening │                     │ • Purpose: Permit Audit /   │
+     │ • Output: Pixel Polygon     │                     │   Automated Auto-Labeling   │
+     └─────────────────────────────┘                     └─────────────────────────────┘
